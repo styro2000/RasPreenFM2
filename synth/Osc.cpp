@@ -241,6 +241,28 @@ void Osc::newNote(struct OscState* oscState, int note) {
     oscState->frequency = oscState->mainFrequency;
 }
 
+void Osc::RetriggerNote(struct OscState* oscState, int note) {
+
+    switch ((int)oscillator->frequencyType) {
+    case OSC_FT_KEYBOARD:
+        oscState->mainFrequency = frequencyToUse[note] * oscillator->frequencyMul * (1.0f + oscillator->detune * .05f);
+        oscState->mainFrequency *= (INV440 * synthState->fullState.globalTuning);																				 
+        break;
+    case OSC_FT_FIXE:
+        oscState->mainFrequency = oscillator->frequencyMul* 1000.0f + oscillator->detune * 100.0f;
+        if (oscState->mainFrequency < 0.0f) {
+            oscState->mainFrequency = 0.0f;
+        }
+        break;
+    case OSC_FT_KEYHZ:
+        oscState->mainFrequency = frequencyToUse[note] * oscillator->frequencyMul;
+        oscState->mainFrequency *= (INV440 * synthState->fullState.globalTuning);
+        oscState->mainFrequency += oscillator->detune;
+        break;
+    }
+    oscState->frequency = oscState->mainFrequency;
+}
+
 
 void Osc::glideToNote(struct OscState* oscState, int note) {
     switch ((int)oscillator->frequencyType) {

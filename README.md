@@ -135,7 +135,7 @@ Other things i changed:
 - put Polyphony to 20 and Operators to 120 (takes about 160us to calculate on full load with Filter h3o+ on Voice, ca 45% of the 
   Sound-DMA IRQ Rate of 333uS, with Filter LP it takes about 120uS)
 
-- the length of the Stepsequencers can be set from 2-16 steps (value 1 over F on the reset-step)
+- the length of the StepLFOs can be set from 2-16 steps (value 1 over F on the reset-step)
 
 - new modmatrix sources 
   p1u,p2u,p3u,p4u  -> unipolar performance control (0.0 - 1.0)
@@ -154,6 +154,11 @@ Other things i changed:
 - in Menu->Set->OutLvl its possibile to set the Output Level of the Timbres: 
   dynamic (Default as PreenFM2), fixTimbre -6dB (all timbres have -6dB, beware of clipping)
   fixTimbre -12dB or fixTimbre -18dB
+
+- if it steals a voice in release with the same note it doesnt restart the Operators (less clicking when long release)
+
+- the the MIDIClock synced StepLFOs can be restarted with a Note
+  BPM Parameter of the StepLFO has new the entrys "RC/4","RC/2","RC","RC*2","RC*4" for RetriggerClock MidiClock synchronization values
 
 
 known Bugz:

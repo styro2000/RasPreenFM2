@@ -40,6 +40,7 @@ public:
     void endNoteOrBeginNextOne();
 
     void noteOnWithoutPop(short note, short velocity, unsigned int index);
+    void RetriggerNote(short note, short velocity, unsigned int index);
     void noteOn(short note, short velocity, unsigned int index);
     void glideToNote(short newNote);
     void killNow();

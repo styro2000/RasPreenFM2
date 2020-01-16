@@ -37,7 +37,6 @@ void LfoStepSeq::init(struct StepSequencerParams* stepSeqParam, struct StepSeque
 void LfoStepSeq::midiClock(int songPosition, bool computeStep) {
 
 	ticks &= 0x7ff;
-
     switch ((int)seqParams->bpm)  {
 	case LFO_SEQ_MIDICLOCK_DIV_4:
 		// Midi Clock  / 4
@@ -49,11 +48,26 @@ void LfoStepSeq::midiClock(int songPosition, bool computeStep) {
 			if (resetstep > 20){								//styro if resetstep > 20  -> 16 step seq
 				phase = (float)(songPosition & 0x3f) * .25f;
 			}else{
-				if (resetstep < 1)
+				if (unlikely(resetstep < 1))
 					resetstep=1;
 				phase = (songPosition % (resetstep*4))  * .25f;
 			}
- //           phase = (float)(songPosition & 0x3f) * .25f;		// original
+		}
+		break;
+	case LFO_SEQ_MIDICLOCK_RETRIGGER_DIV_4:
+		// Midi Clock  / 4
+		if ((songPosition & 0x1)==0) {
+			if (computeStep) {
+                phaseStep = 0.5f * invTab[ticks];
+                ticks = 0;
+			}
+			if (resetstep > 20){								//styro if resetstep > 20  -> 16 step seq
+				phase = (float)(NoteOnsongPosition & 0x3f) * .25f;
+			}else{
+				if (unlikely(resetstep < 1))
+					resetstep=1;
+				phase = (NoteOnsongPosition % (resetstep*4))  * .25f;
+			}
 		}
 		break;
 	case LFO_SEQ_MIDICLOCK_DIV_2:
@@ -65,11 +79,25 @@ void LfoStepSeq::midiClock(int songPosition, bool computeStep) {
 			if (resetstep > 20){
 				phase = (float)(songPosition & 0x1f) * .5f;
 			}else{
-				if (resetstep < 1)
+				if (unlikely(resetstep < 1))
 					resetstep=1;
 				phase = (songPosition % (resetstep*2))  * .5f;
 			}
-//			phase = (float)(songPosition & 0x1f) * .5f;
+		}
+		break;
+	case LFO_SEQ_MIDICLOCK_RETRIGGER_DIV_2:
+		if ((songPosition & 0x1)==0) {
+			if (computeStep) {
+                phaseStep = 1.0f * invTab[ticks];
+				ticks = 0;
+			}
+			if (resetstep > 20){
+				phase = (float)(NoteOnsongPosition & 0x1f) * .5f;
+			}else{
+				if (unlikely(resetstep < 1))
+					resetstep=1;
+				phase = (NoteOnsongPosition % (resetstep*2))  * .5f;
+			}
 		}
 		break;
 	case LFO_SEQ_MIDICLOCK:
@@ -83,9 +111,26 @@ void LfoStepSeq::midiClock(int songPosition, bool computeStep) {
 			if (resetstep > 20){
 				phase = (float)(songPosition & 0xF);
 			}else{
-				if (resetstep < 1)
+				if (unlikely(resetstep < 1))
 					resetstep=1;
 				phase = (float)(songPosition % (resetstep));
+			}
+		}
+		break;
+	case LFO_SEQ_MIDICLOCK_RETRIGGER:
+		if ((songPosition & 0x1)==0) {
+			if (computeStep) {
+			    // We're called evey 2 ticks which is half a quarter
+			    // We want to move forward 4 beats per quarter so : 2 beats per half a quarter
+                phaseStep = 2.0f * invTab[ticks];
+				ticks = 0;
+			}
+			if (resetstep > 20){
+				phase = (float)((NoteOnsongPosition) & 0xF);
+			}else{
+				if (unlikely(resetstep < 1))
+					resetstep=1;
+				phase = (float)((NoteOnsongPosition) % (resetstep));
 			}
 		}
 		break;
@@ -98,9 +143,25 @@ void LfoStepSeq::midiClock(int songPosition, bool computeStep) {
 			if (resetstep > 20){
 				phase = (float)((songPosition << 1) & 0xF);
 			}else{
-				if (resetstep < 1)
+				if (unlikely(resetstep < 1))
 					resetstep=1;
 				phase = (float)((songPosition << 1) % (resetstep));
+			}
+//			phase = ((songPosition << 1) & 0xF);
+		}
+		break;
+	case LFO_SEQ_MIDICLOCK_RETRIGGER_TIME_2:
+		if ((songPosition & 0x1)==0) {
+			if (computeStep) {
+                phaseStep = 4.0f * invTab[ticks];
+				ticks = 0;
+			}
+			if (resetstep > 20){
+				phase = (float)((NoteOnsongPosition << 1) & 0xF);
+			}else{
+				if (unlikely(resetstep < 1))
+					resetstep=1;
+				phase = (float)((NoteOnsongPosition << 1) % (resetstep));
 			}
 //			phase = ((songPosition << 1) & 0xF);
 		}
@@ -114,14 +175,30 @@ void LfoStepSeq::midiClock(int songPosition, bool computeStep) {
 			if (resetstep > 20){
 				phase = (float)((songPosition << 1) & 0xF);
 			}else{
-				if (resetstep < 1)
+				if (unlikely(resetstep < 1))
 					resetstep=1;
 				phase = (float)((songPosition << 1) % (resetstep));
 			}
-//            phase = ((songPosition << 1) & 0xF);
+		}
+		break;
+	case LFO_SEQ_MIDICLOCK_RETRIGGER_TIME_4:
+		if ((songPosition & 0x1)==0) {
+			if (computeStep) {
+                phaseStep = 8.0f * invTab[ticks];
+				ticks = 0;
+			}
+			if (resetstep > 20){
+				phase = (float)((NoteOnsongPosition << 1) & 0xF);
+			}else{
+				if (unlikely(resetstep < 1))
+					resetstep=1;
+				phase = (float)((NoteOnsongPosition << 1) % (resetstep));
+			}
 		}
 		break;
 	}
+	NoteOnsongPosition++;
+
 }
 
 
@@ -197,10 +274,11 @@ void LfoStepSeq::nextValueInMatrix() {
 }
 
 void LfoStepSeq::noteOn() {
-	if (seqParams->bpm < LFO_SEQ_MIDICLOCK_DIV_4) {
+//	if ((seqParams->bpm < LFO_SEQ_MIDICLOCK_DIV_4) || (MidiNoteOnRetrigger == 1)) {
 		phase = 0;
 		target = seqSteps->steps[0];
-	}
+		NoteOnsongPosition = 1;
+//	}
 }
 
 void LfoStepSeq::noteOff() {

@@ -449,6 +449,50 @@ void Voice::glideToNote(short newNote) {
 	currentTimbre->osc6.glideToNote(&oscState6, newNote);
 }
 
+void Voice::RetriggerNote(short newNote, short velocity, unsigned int index) {
+	// Update index : so that few chance to be chosen again during the quick dying
+	this->index = index;
+
+		// update note now so that the noteOff is triggered by the new note
+		// this->note = newNote;
+		// Quick dead !
+		// this->newNotePending = true;
+		// this->nextVelocity = velocity;
+		// this->nextPendingNote = newNote;
+		// Not release anymore... not available for new notes...
+		this->released = false;
+
+    	lfoEnv[0].noteRetrigger();
+		lfoStepSeq[1].noteOn();
+
+        currentTimbre->env1.RetriggerAfterMatrixCompute(&envState1, &matrix);
+        currentTimbre->env2.RetriggerAfterMatrixCompute(&envState2, &matrix);
+        currentTimbre->env3.RetriggerAfterMatrixCompute(&envState3, &matrix);
+        currentTimbre->env4.RetriggerAfterMatrixCompute(&envState4, &matrix);
+        currentTimbre->env5.RetriggerAfterMatrixCompute(&envState5, &matrix);
+        currentTimbre->env6.RetriggerAfterMatrixCompute(&envState6, &matrix);
+
+		float velo = (float)velocity * .0078125f;
+		this->velIm1 = currentTimbre->params.engineIm1.modulationIndexVelo1 * velo;
+		this->velIm2 = currentTimbre->params.engineIm1.modulationIndexVelo2 * velo;
+		this->velIm3 = currentTimbre->params.engineIm2.modulationIndexVelo3 * velo;
+		this->velIm4 = currentTimbre->params.engineIm2.modulationIndexVelo4 * velo;
+		this->velIm5 = currentTimbre->params.engineIm3.modulationIndexVelo5 * velo;
+
+		int zeroVelo = (16 - currentTimbre->params.engine1.velocity) * 8;
+		int newVelocity = zeroVelo + ((velocity * (128 - zeroVelo)) >> 7);
+		this->velocity = newVelocity * .0078125f; // divide by 127
+
+        currentTimbre->osc1.RetriggerNote(&oscState1, newNote);
+        currentTimbre->osc2.RetriggerNote(&oscState2, newNote);
+        currentTimbre->osc3.RetriggerNote(&oscState3, newNote);
+        currentTimbre->osc4.RetriggerNote(&oscState4, newNote);
+        currentTimbre->osc5.RetriggerNote(&oscState5, newNote);
+        currentTimbre->osc6.RetriggerNote(&oscState6, newNote);
+
+	    this->newNotePlayed = false;
+//		out_led2.Invert();
+}
 
 void Voice::noteOnWithoutPop(short newNote, short velocity, unsigned int index) {
 	// Update index : so that few chance to be chosen again during the quick dying
@@ -7344,6 +7388,7 @@ void Voice::setCurrentTimbre(Timbre *timbre) {
     for (int k = 0; k< NUMBER_OF_LFO_STEP; k++) {
         lfoStepSeq[k].init(stepseqparams[k], stepseqs[k], &matrix, (SourceEnum)(MATRIX_SOURCE_LFOSEQ1+k), (DestinationEnum)(LFOSEQ1_GATE+k));
     }
+//	lfoStepSeq[1].setMidiNoteOnRetrigger(1);					// seq2 retriggers in MidiClkMode on NoteOn
 
 	// for (int j=0; j<NUMBER_OF_ENCODERS; j++) {					// styro update LFOs after Voice Count change bug
 	// 	this->lfoOsc[0].valueChanged(j);						// without this the freq of the LFOs of the new allocated Voices
@@ -7353,19 +7398,19 @@ void Voice::setCurrentTimbre(Timbre *timbre) {
 
 	float value;
 
-	value =	timbre->getParamRaw()->performance1.perf1;
-	this->matrix.setSource(MATRIX_SOURCE_CC1,value);
-	this->matrix.setSource(MATRIX_SOURCE_CC1U,(value + 1.0f) / 2.0f);
-	value =	timbre->getParamRaw()->performance1.perf2;
-	this->matrix.setSource(MATRIX_SOURCE_CC2,value);
-	this->matrix.setSource(MATRIX_SOURCE_CC2U,(value + 1.0f) / 2.0f);
-	value =	timbre->getParamRaw()->performance1.perf3;
-	this->matrix.setSource(MATRIX_SOURCE_CC3,value);
-	this->matrix.setSource(MATRIX_SOURCE_CC3U,(value + 1.0f) / 2.0f);
-	value =	timbre->getParamRaw()->performance1.perf4;
-	this->matrix.setSource(MATRIX_SOURCE_CC4,value);
-	this->matrix.setSource(MATRIX_SOURCE_CC4U,(value + 1.0f) / 2.0f);
-	this->matrix.setSource(MATRIX_SOURCE_CONSTANT,1.0f);
+	// value =	timbre->getParamRaw()->performance1.perf1;
+	// this->matrix.setSource(MATRIX_SOURCE_CC1,value);
+	// this->matrix.setSource(MATRIX_SOURCE_CC1U,(value + 1.0f) / 2.0f);
+	// value =	timbre->getParamRaw()->performance1.perf2;
+	// this->matrix.setSource(MATRIX_SOURCE_CC2,value);
+	// this->matrix.setSource(MATRIX_SOURCE_CC2U,(value + 1.0f) / 2.0f);
+	// value =	timbre->getParamRaw()->performance1.perf3;
+	// this->matrix.setSource(MATRIX_SOURCE_CC3,value);
+	// this->matrix.setSource(MATRIX_SOURCE_CC3U,(value + 1.0f) / 2.0f);
+	// value =	timbre->getParamRaw()->performance1.perf4;
+	// this->matrix.setSource(MATRIX_SOURCE_CC4,value);
+	// this->matrix.setSource(MATRIX_SOURCE_CC4U,(value + 1.0f) / 2.0f);
+//	this->matrix.setSource(MATRIX_SOURCE_CONSTANT,1.0f);
 
 //	this->matrix.setSource(MATRIX_SOURCE_CC1,1.0f);
 //     num = encoder + ROW_PERFORMANCE1 * NUMBER_OF_ENCODERS;

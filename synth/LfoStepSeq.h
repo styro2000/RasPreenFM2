@@ -43,6 +43,9 @@ private:
     int currentValue;
     bool gated;
     int resetstep=21;			// if higher then 20 -> 16 steps
+    uint8_t tickdiv =0;
+    int TmpsongPosition=0;
+    int NoteOnsongPosition=0;
     DestinationEnum matrixGateDestination;
 };
 

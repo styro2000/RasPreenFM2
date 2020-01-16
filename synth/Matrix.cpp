@@ -28,4 +28,6 @@ Matrix::~Matrix() {
 
 void Matrix::init(struct MatrixRowParams* matrixRows) {
     this->rows = matrixRows;
+    setSource(MATRIX_SOURCE_CONSTANT, 1.0f);                        // styro set Constant to 1.0
+
 }

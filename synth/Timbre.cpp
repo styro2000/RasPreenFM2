@@ -141,7 +141,8 @@ enum NewNoteType {
 	NEW_NOTE_FREE = 0,
 	NEW_NOTE_RELEASE,
 	NEW_NOTE_OLD,
-	NEW_NOTE_NONE
+	NEW_NOTE_NONE,
+	SAME_NOTE_RELEASE
 };
 
 
@@ -343,8 +344,13 @@ void Timbre::preenNoteOn(uint8_t note, uint8_t velocity) {
 				int indexVoice = voices[n]->getIndex();
 				if (indexVoice < indexMin) {
 					indexMin = indexVoice;
-					voiceToUse = n;
-					newNoteType = NEW_NOTE_RELEASE;
+					if (voices[n]->note == note){
+						voiceToUse = n;
+						newNoteType = SAME_NOTE_RELEASE;
+					}else if (newNoteType != SAME_NOTE_RELEASE){
+						voiceToUse = n;
+						newNoteType = NEW_NOTE_RELEASE;
+					}
 				}
 			}
 		}
@@ -393,6 +399,9 @@ void Timbre::preenNoteOn(uint8_t note, uint8_t velocity) {
 		case NEW_NOTE_OLD:
 		case NEW_NOTE_RELEASE:
 			voices[voiceToUse]->noteOnWithoutPop(note, velocity, voiceIndex++);
+			break;
+		case SAME_NOTE_RELEASE:
+			voices[voiceToUse]->RetriggerNote(note, velocity, voiceIndex++);
 			break;
 		}
 

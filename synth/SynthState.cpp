@@ -479,13 +479,13 @@ struct ParameterRowDisplay lfoParameterRow = {
 
 
 
-const char* lfoSeqMidiClock[] =  { "MC/4", "MC/2", "MC  ", "MC*2", "MC*4" };
+const char* lfoSeqMidiClock[] =  { "MC/4", "MC/2", "MC  ", "MC*2", "MC*4", "RC/4", "RC/2", "RC  ", "RC*2", "RC*4"  };
 
 struct ParameterRowDisplay lfoStepParameterRow = {
         "Step Seq",
         { "Bpm ", "Gate", "    ", "    " },
         {
-                { 10 ,245, 236, DISPLAY_TYPE_STEP_SEQ_BPM, nullNames, nullNamesOrder, nullNamesOrder},
+                { 10 ,250, 241, DISPLAY_TYPE_STEP_SEQ_BPM, nullNames, nullNamesOrder, nullNamesOrder},
                 { 0 , 1, 101, DISPLAY_TYPE_FLOAT, nullNames, nullNamesOrder, nullNamesOrder},
                 { 0, 0, 0, DISPLAY_TYPE_STEP_SEQ1, nullNames, nullNamesOrder, nullNamesOrder },
                 { 0, 0, 0, DISPLAY_TYPE_STEP_SEQ2, nullNames, nullNamesOrder, nullNamesOrder }

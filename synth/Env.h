@@ -137,6 +137,11 @@ public:
         env->currentPhase = 0;
     }
 
+    void restartEnv(struct EnvData* env){
+
+
+
+    }
 
     inline float getNextAmpExp(struct EnvData* env) {
         float incPhase;
@@ -211,11 +216,40 @@ public:
         env->stateIncDecay= incTab[(int)(decay * 100.0f)];
     }
 
+    void RetriggerAfterMatrixCompute(struct EnvData* env, Matrix* matrix) {
+        env->envState = ENV_STATE_ON_A;
+        newState(env);
+
+        float attack = envParamsA->attackTime + matrix->getDestination((enum DestinationEnum)(ENV1_ATTACK + envNumber));
+        float decay = envParamsA->decayTime;
+
+        if (unlikely(algoOpInformation[(int)*this->algoNumber][this->envNumber]) == OPERATOR_CARRIER) {
+            attack += matrix->getDestination(ALL_ENV_ATTACK);
+            decay += matrix->getDestination(ALL_ENV_DECAY);
+        }
+        if (unlikely(algoOpInformation[(int)*this->algoNumber][this->envNumber]) == OPERATOR_MODULATOR) {
+            attack += matrix->getDestination(ALL_ENV_ATTACK_MODULATOR);
+            decay += matrix->getDestination(ALL_ENV_DECAY_MODULATOR);
+        }
+
+        if (unlikely(decay < 0.0f)) {
+            decay = 0.0f;
+        }
+        if (unlikely(attack < 0.0f)) {
+            attack = 0.0f;
+        }
+        //stateInc[ENV_STATE_ON_A] = incTab[(int)(attack * 100.0f)];
+        env->stateIncAttack = incTab[(int)(attack * 100.0f)];
+        env->stateIncDecay= incTab[(int)(decay * 100.0f)];
+    }
+
+
     void noteOffQuick(struct EnvData* env) {
         env->envState = ENV_STATE_ON_QUICK_R;
         newState(env);
 
-        int duration = 6 * env->currentValue ;
+//        int duration = 6 * env->currentValue ;
+        int duration = 20 * env->currentValue ;                  // styro less clicky
 
         if (duration == 0) {
         	stateInc[ENV_STATE_ON_QUICK_R] = 1.0f;

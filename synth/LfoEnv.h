@@ -76,6 +76,11 @@ public:
         newState();
 	}
 
+	void noteRetrigger() {
+        env.envState = ENV_STATE_ON_A;
+        newState();
+	}
+
 	void noteOff() {
 		env.envState = ENV_STATE_ON_R;
 		newState();
