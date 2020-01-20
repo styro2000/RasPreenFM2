@@ -558,7 +558,9 @@ void Timbre::cleanNextBlock() {
 
 void Timbre::prepareMatrixForNewBlock() {
     for (int k = 0; k < params.engine1.numberOfVoice; k++) {
-        voices[voiceNumber[k]]->prepareMatrixForNewBlock();
+		if (voiceNumber[k] != -1){
+        	voices[voiceNumber[k]]->prepareMatrixForNewBlock();
+		}
     }
 }
 
@@ -665,6 +667,12 @@ default:
 
 }
 
+void Timbre::UpdatePerformanceValues() {
+    setMatrixSource((enum SourceEnum)(MATRIX_SOURCE_CC1),((OneSynthParams*)this->getParamRaw())->performance1.perf1);
+    setMatrixSource((enum SourceEnum)(MATRIX_SOURCE_CC2),((OneSynthParams*)this->getParamRaw())->performance1.perf2);
+    setMatrixSource((enum SourceEnum)(MATRIX_SOURCE_CC3),((OneSynthParams*)this->getParamRaw())->performance1.perf3);
+    setMatrixSource((enum SourceEnum)(MATRIX_SOURCE_CC4),((OneSynthParams*)this->getParamRaw())->performance1.perf4);
+}
 
 void Timbre::afterNewParamsLoad() {
     for (int k = 0; k < params.engine1.numberOfVoice; k++) {

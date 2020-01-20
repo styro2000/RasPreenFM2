@@ -161,20 +161,7 @@ void Synth::buildNewSampleBlock() {
         timbres[t].setMatrixSource(MATRIX_SOURCE_CVIN4, cvin->getCvin4());
 #endif
 
-		if (usb_filesomething_hack == 0){   // hack prevent crashing at prepareMatrixForNewBlock() while usb
-//                out_led2.Set(0);
-			timbres[t].prepareMatrixForNewBlock();
-		}else{
-			if (usb_filesomething_hack != 5){
-				// if ((usb_filesomething_hack-1) != t){
-				//     timbres[t].prepareMatrixForNewBlock();              
-				// }else{
-				//     out_led2.Set(1);
-				// }
-			}else{
-//                    out_led2.Set(1);
-			}
-		}
+		timbres[t].prepareMatrixForNewBlock();
     }
 
 #ifdef CVIN
@@ -353,6 +340,11 @@ void Synth::afterNewParamsLoad(int timbre) {
 
     timbres[timbre].numberOfVoicesChanged();
     timbres[timbre].afterNewParamsLoad();
+
+    for (int t=0; t<NUMBER_OF_TIMBRES ; t++) {
+        timbres[t].UpdatePerformanceValues();
+    }
+
     // values to force check lfo used
     timbres[timbre].verifyLfoUsed(ENCODER_MATRIX_SOURCE, 0.0f, 1.0f);
 

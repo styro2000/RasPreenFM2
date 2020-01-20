@@ -79,10 +79,6 @@ but it worked without :-) (but if somebody could give me a hint it would be grea
 
 The soundbuffer-calculating async in the main loop didn't work to well, gave glitches while screen
 writes, so i put the calculating in the DMA-Irq of the sounddevice.
-A strange thing happened then, it crashed in prepareMatrixForNewBlock in the LFO Section
-while loading a new patch (during the usb-file operations). A long and fruitless search
-why? didnt help so i did a really ugly hack and disabled the prepareMatrixForNewBlock()
-while loading patches.
 
 Other things i changed:
 - Changed BLOCK_SIZE to 16 for smaller latency, gave me first horrible aliasing in the higher notes, changing 
@@ -159,6 +155,9 @@ Other things i changed:
 
 - the the MIDIClock synced StepLFOs can be restarted with a Note
   BPM Parameter of the StepLFO has new the entrys "RC/4","RC/2","RC","RC*2","RC*4" for RetriggerClock MidiClock synchronization values
+
+- Performance Controllers are restored when an other timbre is loaded
+
 
 
 known Bugz:

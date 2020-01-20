@@ -144,6 +144,7 @@ public:
     }
 
     float volume = 1.0f;                     // styro for volume control via midi & volumes-page
+    void UpdatePerformanceValues(void);
 
 
 
